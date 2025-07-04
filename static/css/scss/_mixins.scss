@@ -1,0 +1,56 @@
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// トランジション
+@mixin transition($property: all, $duration: 0.3s, $easing: ease) {
+  transition: $property $duration $easing;
+}
+
+// ボーダー
+@mixin border-dashed($color: $upload-border-color, $width: 2px) {
+  border: $width dashed $color;
+}
+
+// ボタンホバー効果
+@mixin button-hover($bg-color, $hover-color, $text-color: white) {
+  background-color: $bg-color;
+  color: $text-color;
+  @include transition();
+  
+  &:hover {
+    background-color: $hover-color;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+// カード効果
+@mixin card-shadow($hover: false) {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  @if $hover {
+    @include transition();
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// レスポンシブ
+@mixin responsive($breakpoint) {
+  @if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) { @content; }
+  }
+  @if $breakpoint == md {
+    @media (max-width: $breakpoint-md) { @content; }
+  }
+  @if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) { @content; }
+  }
+  @if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl) { @content; }
+  }
+}
