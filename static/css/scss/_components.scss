@@ -1,0 +1,142 @@
+// アップロードエリア
+.upload-area {
+  @include border-dashed($upload-border-color);
+  border-radius: $border-radius;
+  padding: $upload-padding;
+  text-align: center;
+  margin: 20px 0;
+  @include transition();
+  background-color: #ffffff;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: $upload-border-hover;
+    background-color: $upload-bg-hover;
+    transform: translateY(-2px);
+  }
+  
+  &.dragover {
+    border-color: $upload-border-success;
+    background-color: $upload-bg-dragover;
+    transform: scale(1.02);
+  }
+  
+  i {
+    @include transition();
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+  
+  h4 {
+    margin-top: 1rem;
+    color: $primary-color;
+    font-weight: 600;
+  }
+  
+  p {
+    margin-bottom: 1.5rem;
+    color: #6c757d;
+  }
+  
+  @include responsive(md) {
+    padding: 20px;
+    
+    h4 {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+// プレビュー画像
+.preview-container {
+  margin: 2rem 0;
+  
+  #previewImage {
+    max-height: 300px;
+    border-radius: $border-radius-sm;
+    @include card-shadow(true);
+    
+    @include responsive(md) {
+      max-height: 200px;
+    }
+  }
+}
+
+// ボタン
+.btn {
+  border-radius: $border-radius-sm;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  @include transition();
+  
+  &.btn-primary {
+    @include button-hover($primary-color, $primary-hover);
+  }
+  
+  &.btn-success {
+    @include button-hover($success-color, darken($success-color, 10%));
+  }
+  
+  &.btn-secondary {
+    @include button-hover(#6c757d, darken(#6c757d, 10%));
+  }
+  
+  &.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+// カード
+.card {
+  border-radius: $border-radius;
+  @include card-shadow();
+  border: none;
+  
+  .card-body {
+    padding: 1.5rem;
+    
+    pre {
+      background-color: $light-color;
+      padding: 1rem;
+      border-radius: $border-radius-sm;
+      border: 1px solid #e9ecef;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  }
+}
+
+// アラート
+.alert {
+  border-radius: $border-radius-sm;
+  border: none;
+  @include card-shadow();
+  
+  &.alert-danger {
+    background-color: lighten($danger-color, 40%);
+    color: darken($danger-color, 20%);
+  }
+  
+  &.alert-success {
+    background-color: lighten($success-color, 40%);
+    color: darken($success-color, 20%);
+  }
+}
+
+// スピナー
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
