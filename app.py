@@ -4,13 +4,15 @@ import uuid
 from PIL import Image
 import google.generativeai as genai
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 # 環境変数読み込み
 load_dotenv()
 
 app = Flask(__name__)
+# アップロードディレクトリ設定
+# ✍️ UPLOAD_FOLDERはアップロードされたファイルを保存するディレクトリのパス
 app.config["UPLOAD_FOLDER"] = "static/uploads"
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "your-secret-key-here")
 
 # ディレクトリ作成
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -26,16 +28,22 @@ def analyze_schedule_image(image_path):
     model = genai.GenerativeModel("gemini-2.0-flash")
     image = Image.open(image_path)
 
-    prompt = """
+    today = datetime.now()
+    today_str = today.strftime("%Y年%m月%d日")
+
+    prompt = f"""
     この画像から日程・スケジュール情報を抽出してください。
+    今日の日付は{today_str}です。
+
     以下の形式で回答してください：
-    
+
     日付: YYYY-MM-DD
     時間: HH:MM-HH:MM
     イベント名: [イベント名]
     場所: [場所名]（記載があれば）
-    
-    複数のイベントがある場合は、それぞれ分けて記載してください。
+
+    注意事項：
+    - 複数のイベントがある場合は、それぞれ分けて記載してください
     """
 
     response = model.generate_content([prompt, image], stream=False)
