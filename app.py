@@ -4,7 +4,7 @@ import uuid
 from PIL import Image
 import google.generativeai as genai
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # 環境変数読み込み
 load_dotenv()
@@ -29,6 +29,7 @@ def analyze_schedule_image(image_path):
     image = Image.open(image_path)
 
     today = datetime.now()
+    today = today.astimezone(timezone(timedelta(hours=9)))
     today_str = today.strftime("%Y年%m月%d日")
 
     prompt = f"""
