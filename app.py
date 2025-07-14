@@ -1,18 +1,26 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, session
 import os
 import uuid
 from PIL import Image
 import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
+from google_auth_oauthlib.flow import Flow
+
+# Google Calendar API関連の設定
+CLIENT_SECRETS_FILE = "credentials.json"
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 # 環境変数読み込み
 load_dotenv()
 
 app = Flask(__name__)
 # アップロードディレクトリ設定
-# ✍️ UPLOAD_FOLDERはアップロードされたファイルを保存するディレクトリのパス
 app.config["UPLOAD_FOLDER"] = "static/uploads"
+
+# セッションを安全に使うための「秘密鍵」を設定
+SECRET_KEY = os.environ.get("SECRET_KEY")
+app.secret_key = SECRET_KEY
 
 # ディレクトリ作成
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -79,6 +87,54 @@ def index():
                     os.remove(filepath)
 
     return render_template("index.html")
+
+
+@app.route("/login", methods=["GET"])
+def login():
+    flow = Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE,
+        scopes=SCOPES,
+        redirect_uri=url_for("oauth2callback", _external=True),
+    )
+
+    # 認証URLとstateを取得
+    # ✍️ ランダムな文字列である合言葉 (state）を生成してセッションに保存
+    authorization_url, state = flow.authorization_url()
+    session["state"] = state
+
+    # ユーザーをGoogleの認証ページへリダイレクト
+    # ✍️ ここで、合言葉(state)が埋め込まれた認証URLにユーザーを飛ばす（CSRF対策）
+    return redirect(authorization_url)
+
+# セッションが保存できる辞書形式に変換する関数
+def credentials_to_dict(credentials):
+    return {
+        "token": credentials.token,
+        "refresh_token": credentials.refresh_token,
+        "token_uri": credentials.token_uri,
+        "client_id": credentials.client_id,
+        "client_secret": credentials.client_secret,
+        "scopes": credentials.scopes,
+    }
+
+@app.route("/oauth2callback", methods=["GET"])
+def oauth2callback():
+    flow = Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE,
+        scopes=SCOPES,
+        state=session["state"],
+        redirect_uri=url_for("oauth2callback", _external=True),
+    )
+
+    # 認証コードをアクセストークンに交換
+    flow.fetch_token(authorization_response=request.url)
+
+    # 認証情報をセッションに保存
+    credentials = flow.credentials
+    print(credentials.__dict__)
+    session["credentials"] = credentials_to_dict(credentials)
+
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
