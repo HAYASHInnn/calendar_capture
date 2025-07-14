@@ -44,7 +44,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-credentials.json
 
 # Flask instance folder
 instance/
