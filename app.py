@@ -141,7 +141,6 @@ def oauth2callback():
 
     # 認証情報をセッションに保存
     credentials = flow.credentials
-    print(credentials.__dict__)
     session["credentials"] = credentials_to_dict(credentials)
 
     return redirect(url_for("index"))
