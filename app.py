@@ -138,4 +138,7 @@ def oauth2callback():
 
 
 if __name__ == "__main__":
+    # 開発環境でHTTPでのOAuth認証を許可するための設定
+    # ❗ 本番環境ではこの行は削除し、必ずHTTPSを使用する！！！
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
     app.run(debug=True, host="0.0.0.0", port=3000)
