@@ -61,6 +61,13 @@ def analyze_schedule_image(image_path):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # セッションに 'credentials' があればログイン済み
+    is_logged_in = 'credentials' in session
+
+    if not is_logged_in:
+        # ログインしていなければ、ログインを促すページを表示
+        return render_template("index.html", is_logged_in=False)
+
     if request.method == "POST":
         file = request.files.get("image")
         if file and file.filename:
@@ -86,7 +93,10 @@ def index():
                 if os.path.exists(filepath):
                     os.remove(filepath)
 
-    return render_template("index.html")
+        return render_template("index.html")
+
+    # GETリクエストの場合 (ログイン済みで、ただトップページを表示するとき)
+    return render_template("index.html", is_logged_in=True)
 
 
 @app.route("/login", methods=["GET"])
@@ -135,6 +145,13 @@ def oauth2callback():
     session["credentials"] = credentials_to_dict(credentials)
 
     return redirect(url_for("index"))
+
+@app.route('/logout')
+def logout():
+    # セッションからcredentialsを削除
+    session.pop('credentials', None)
+    # トップページにリダイレクト
+    return redirect(url_for('index'))
 
 
 if __name__ == "__main__":
