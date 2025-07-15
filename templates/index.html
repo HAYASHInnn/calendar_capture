@@ -5,6 +5,24 @@
 
     {% if error %}
     <div class="alert alert-danger">{{ error }}</div>
+    {% endif %} {% if is_logged_in %}
+    <!-- ===== ログインしている時に表示する内容 ===== -->
+    <p class="text-center">Googleアカウントにログインしています</p>
+    <div class="text-center mb-3">
+      <a href="{{ url_for('logout') }}" class="btn btn-primary btn-lg">ログアウト</a>
+    </div>
+    <hr />
+    {% else %}
+    <!-- ===== ログインしていない時に表示する内容 ===== -->
+    <p class="text-center">
+      Googleアカウントでログインすると、すべての機能をご利用いただけます
+    </p>
+    <div class="text-center mb-4">
+      <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+        <i class="fab fa-google"></i>
+        Googleでログイン
+      </a>
+    </div>
     {% endif %}
 
     <form method="post" enctype="multipart/form-data" id="uploadForm">
