@@ -8,41 +8,41 @@
   @include transition();
   background-color: #ffffff;
   cursor: pointer;
-  
+
   &:hover {
     border-color: $upload-border-hover;
     background-color: $upload-bg-hover;
     transform: translateY(-2px);
   }
-  
+
   &.dragover {
     border-color: $upload-border-success;
     background-color: $upload-bg-dragover;
     transform: scale(1.02);
   }
-  
+
   i {
     @include transition();
-    
+
     &:hover {
       transform: scale(1.1);
     }
   }
-  
+
   h4 {
     margin-top: 1rem;
     color: $primary-color;
     font-weight: 600;
   }
-  
+
   p {
     margin-bottom: 1.5rem;
     color: #6c757d;
   }
-  
+
   @include responsive(md) {
     padding: 20px;
-    
+
     h4 {
       font-size: 1.2rem;
     }
@@ -52,15 +52,59 @@
 // プレビュー画像
 .preview-container {
   margin: 2rem 0;
-  
+
   #previewImage {
     max-height: 300px;
     border-radius: $border-radius-sm;
     @include card-shadow(true);
-    
+
     @include responsive(md) {
       max-height: 200px;
     }
+  }
+}
+
+// Googleログインボタン
+.google-login-btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background-color: #4285f4;
+  color: white;
+  text-decoration: none;
+  border-radius: $border-radius-sm;
+  font-weight: 500;
+  font-size: 1.1rem;
+  @include transition();
+
+  &:hover {
+    background-color: darken(#4285f4, 10%);
+    color: white;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(66, 133, 244, 0.2);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.3);
+  }
+
+  // アイコン付きバージョン
+  &.with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+
+  // レスポンシブ対応
+  @include responsive(sm) {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 }
 
@@ -70,24 +114,24 @@
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   @include transition();
-  
+
   &.btn-primary {
     @include button-hover($primary-color, $primary-hover);
   }
-  
+
   &.btn-success {
     @include button-hover($success-color, darken($success-color, 10%));
   }
-  
+
   &.btn-secondary {
     @include button-hover(#6c757d, darken(#6c757d, 10%));
   }
-  
+
   &.btn-lg {
     padding: 1rem 2rem;
     font-size: 1.1rem;
   }
-  
+
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -101,10 +145,10 @@
   border-radius: $border-radius;
   @include card-shadow();
   border: none;
-  
+
   .card-body {
     padding: 1.5rem;
-    
+
     pre {
       background-color: $light-color;
       padding: 1rem;
@@ -123,12 +167,12 @@
   border-radius: $border-radius-sm;
   border: none;
   @include card-shadow();
-  
+
   &.alert-danger {
     background-color: lighten($danger-color, 40%);
     color: darken($danger-color, 20%);
   }
-  
+
   &.alert-success {
     background-color: lighten($success-color, 40%);
     color: darken($success-color, 20%);
