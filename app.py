@@ -49,6 +49,7 @@ def analyze_schedule_image(image_path):
     以下のキーと値のペアで、1行ずつ厳密に出力してください。
     値が存在しない場合は「なし」と出力してください。
     複数のイベントがある場合は、--- (ハイフン3つ) で区切ってください。
+    もし開始時間しかない場合は、開始時間と終了時間を開始時間+1時間にしてください。
 
     日付:YYYY-MM-DD
     時間:HH:MM-HH:MM
@@ -127,7 +128,7 @@ def index():
 
         return render_template(
             "result.html",
-            events=events,  # パースしたリストを渡す
+            events=events,  # ✍️ htmlに渡す変数
             image_url=f"/static/uploads/{filename}",
         )
 
