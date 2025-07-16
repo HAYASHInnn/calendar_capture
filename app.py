@@ -6,6 +6,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 from google_auth_oauthlib.flow import Flow
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 # Google Calendar API関連の設定
 CLIENT_SECRETS_FILE = "credentials.json"
@@ -44,20 +46,49 @@ def analyze_schedule_image(image_path):
     この画像から日程・スケジュール情報を抽出してください。
     今日の日付は{today_str}です。
 
-    以下の形式で回答してください：
+    以下のキーと値のペアで、1行ずつ厳密に出力してください。
+    値が存在しない場合は「なし」と出力してください。
+    複数のイベントがある場合は、--- (ハイフン3つ) で区切ってください。
 
-    日付: YYYY-MM-DD
-    時間: HH:MM-HH:MM
-    イベント名: [イベント名]
-    場所: [場所名]（記載があれば）
-
-    注意事項：
-    - 複数のイベントがある場合は、それぞれ分けて記載してください
+    日付:YYYY-MM-DD
+    時間:HH:MM-HH:MM
+    イベント名:イベントの名称
+    場所:場所の名称
+    ---
+    日付:YYYY-MM-DD
+    時間:HH:MM-HH:MM
+    イベント名:イベントの名称
+    場所:場所の名称
     """
 
     response = model.generate_content([prompt, image], stream=False)
     return response.text
 
+def parse_gemini_result(result_text):
+    events = []
+    # --- (ハイフン3つ) で各イベントのテキストに分割
+    event_blocks = result_text.strip().split('---')
+
+    for block in event_blocks:
+        if not block.strip():
+            continue # 空のブロックはスキップ
+
+        event_data = {}
+        lines = block.strip().split('\n')
+        for line in lines:
+            if ':' in line:
+                key, value = line.split(':', 1)
+                event_data[key.strip()] = value.strip()
+
+        # 時間を分割して開始と終了に分ける
+        if '時間' in event_data and '-' in event_data['時間']:
+            start_time, end_time = event_data['時間'].split('-', 1)
+            event_data['開始時間'] = start_time.strip()
+            event_data['終了時間'] = end_time.strip()
+
+        events.append(event_data)
+
+    return events
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -78,10 +109,11 @@ def index():
 
             try:
                 # 画像解析
-                result = analyze_schedule_image(filepath)
+                result_text = analyze_schedule_image(filepath)
+                events = parse_gemini_result(result_text)
                 return render_template(
                     "result.html",
-                    result=result,
+                    events=events,  # ✍️ htmlに渡す変数
                     image_url=f"/static/uploads/{filename}",
                 )
             except Exception as e:
@@ -93,10 +125,78 @@ def index():
                 if os.path.exists(filepath):
                     os.remove(filepath)
 
-        return render_template("index.html")
+        return render_template(
+            "result.html",
+            events=events,  # パースしたリストを渡す
+            image_url=f"/static/uploads/{filename}",
+        )
+
 
     # GETリクエストの場合 (ログイン済みで、ただトップページを表示するとき)
     return render_template("index.html", is_logged_in=True)
+
+@app.route('/create_event', methods=['POST'])
+def create_event():
+    # Googleカレンダーに登録するので、ログインしているか確認
+    if 'credentials' not in session:
+        return redirect(url_for('login'))
+
+    # htmlから送信されたデータを取得
+    summary = request.form.get('summary')
+    date_str = request.form.get('date')
+    start_time_str = request.form.get('start_time')
+    end_time_str = request.form.get('end_time')
+    location = request.form.get('location')
+
+    # セッションからGoogleカレンダーに連携するため、ログイン時の認証情報を読み込む
+    creds_dict = session['credentials']
+    credentials = Credentials(**creds_dict)
+
+    # Googleカレンダーに連携
+    service = build("calendar", "v3", credentials=credentials)
+
+    # APIに渡すため、RFC3339形式のUTC文字列（YYYY-MM-DDTHH:MM:SS）に変換
+    start_datetime_for_api = f"{date_str}T{start_time_str}:00"
+    end_datetime_for_api = f"{date_str}T{end_time_str}:00"
+
+    # APIに渡すイベントデータ（辞書）を作成
+    event_body = {
+        'summary': summary,
+        'location': location,
+        'start': {
+            'dateTime': start_datetime_for_api,
+            'timeZone': 'Asia/Tokyo',
+        },
+        'end': {
+            'dateTime': end_datetime_for_api,
+            'timeZone': 'Asia/Tokyo',
+        },
+    }
+
+    try:
+        # 'primary'はメインカレンダーのこと
+        created_event = service.events().insert(
+            calendarId='primary',
+            body=event_body
+        ).execute()
+
+        # イベント登録したら、ユーザーにメッセージとカレンダーへのリンクを見せる
+        event_url = created_event.get('htmlLink')
+        return f"""
+            イベント「{summary}」をカレンダーに登録しました！<br>
+            <a href="{event_url}" target="_blank">カレンダーで確認する</a><br><br>
+            <a href="{url_for('index')}">トップページに戻る</a>
+        """
+
+    except Exception as e:
+        # --- デバッグのためのコードを追加 ---
+        print("--- エラー発生 ---")
+        print(f"エラーの種類: {type(e)}")
+        print(f"エラーの詳細: {e}")
+        print("-----------------")
+        # -----------------------------
+        return f"エラーが発生しました: {e}"
+
 
 
 @app.route("/login", methods=["GET"])
@@ -107,9 +207,12 @@ def login():
         redirect_uri=url_for("oauth2callback", _external=True),
     )
 
-    # 認証URLとstateを取得
-    # ✍️ ランダムな文字列である合言葉 (state）を生成してセッションに保存
-    authorization_url, state = flow.authorization_url()
+    # ✍️ 認証URLとランダムな文字列である合言葉 (state）を生成してセッションに保存
+    authorization_url, state = flow.authorization_url(
+    # ✍️ リフレッシュトークンを取得し、毎回同意画面を表示させる
+        access_type='offline',
+        prompt='consent'
+    )
     session["state"] = state
 
     # ユーザーをGoogleの認証ページへリダイレクト

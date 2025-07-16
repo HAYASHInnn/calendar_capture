@@ -12,7 +12,36 @@
     <h2>解析結果</h2>
     <div class="card">
       <div class="card-body">
-        <pre class="mb-0">{{ result }}</pre>
+        <pre class="mb-0">{% for event in events %}
+        <form action="{{ url_for('create_event') }}" method="post">
+            <h3>イベント {{ loop.index }}</h3>
+            <div>
+                <label>イベント名:</label>
+                <input type="text" name="summary" value="{{ event.get('イベント名', '') }}">
+            </div>
+            <div>
+                <label>日付:</label>
+                <input type="date" name="date" value="{{ event.get('日付', '') }}">
+            </div>
+            <div>
+                <label>開始時間:</label>
+                <input type="time" name="start_time" value="{{ event.get('開始時間', '') }}">
+            </div>
+            <div>
+                <label>終了時間:</label>
+                <input type="time" name="end_time" value="{{ event.get('終了時間', '') }}">
+            </div>
+            <div>
+                <label>場所:</label>
+                <input type="text" name="location" value="{{ event.get('場所', '') }}">
+            </div>
+            <br>
+            <button type="submit">この内容でカレンダーに登録</button>
+        </form>
+    {% else %}
+        <p>解析できるイベントが見つかりませんでした。</p>
+        <a href="{{ url_for('index') }}">もう一度試す</a>
+    {% endfor %}</pre>
       </div>
     </div>
 
