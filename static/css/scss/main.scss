@@ -1,15 +1,24 @@
-// 変数とミックスイン
-@import 'variables';
-@import 'mixins';
+// 設定
+@import 'config/variables';
+@import 'config/mixins';
 
-// ベーススタイル
-@import 'base';
+// ベース
+@import 'base/reset';
+@import 'base/typography';
 
 // レイアウト
-@import 'layout';
+@import 'layout/header';
+@import 'layout/container';
+@import 'layout/grid';
 
 // コンポーネント
-@import 'components';
+@import 'components/buttons';
+@import 'components/forms';
+@import 'components/cards';
+@import 'components/alerts';
+@import 'components/upload-area';
+@import 'components/preview';
 
 // ユーティリティ
-@import 'utilities';
+@import 'utilities/display';
+@import 'utilities/animations';

@@ -1,0 +1,49 @@
+.upload-area {
+  border: 2px dashed $upload-border-color;
+  border-radius: $border-radius-lg;
+  padding: $upload-padding;
+  text-align: center;
+  margin: $spacing-lg 0;
+  background-color: $white;
+  cursor: pointer;
+  @include transition();
+
+  &:hover {
+    border-color: $upload-border-hover;
+    background-color: $upload-bg-hover;
+    transform: translateY(-2px);
+  }
+
+  &.dragover {
+    border-color: $upload-border-success;
+    background-color: $upload-bg-dragover;
+    transform: scale(1.02);
+  }
+
+  i {
+    @include transition();
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  h4 {
+    margin-top: $spacing-md;
+    color: $primary-color;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: $spacing-lg;
+    color: $medium-gray;
+  }
+
+  @include responsive(md) {
+    padding: $spacing-lg;
+
+    h4 {
+      font-size: 1.2rem;
+    }
+  }
+}

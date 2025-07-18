@@ -1,58 +1,102 @@
 {% extends "base.html" %} {% block content %}
-<div class="row">
-  <div class="col-md-6">
-    <h2>アップロードした画像</h2>
-    <img
-      src="{{ image_url }}"
-      alt="アップロード画像"
-      class="img-fluid rounded"
-    />
-  </div>
-  <div class="col-md-6">
-    <h2>解析結果</h2>
-    <div class="card">
-      <div class="card-body">
-        <pre class="mb-0">{% for event in events %}
-        <form action="{{ url_for('create_event') }}" method="post">
-            <h3>イベント {{ loop.index }}</h3>
-            <div>
-                <label>イベント名:</label>
-                <input type="text" name="summary" value="{{ event.get('イベント名', '') }}">
-            </div>
-            <div>
-                <label>日付:</label>
-                <input type="date" name="date" value="{{ event.get('日付', '') }}">
-            </div>
-            <div>
-                <label>開始時間:</label>
-                <input type="time" name="start_time" value="{{ event.get('開始時間', '') }}">
-            </div>
-            <div>
-                <label>終了時間:</label>
-                <input type="time" name="end_time" value="{{ event.get('終了時間', '') }}">
-            </div>
-            <div>
-                <label>場所:</label>
-                <input type="text" name="location" value="{{ event.get('場所', '') }}">
-            </div>
-            <br>
-            <button type="submit">この内容でカレンダーに登録</button>
-        </form>
-    {% else %}
-        <p>解析できるイベントが見つかりませんでした。</p>
-        <a href="{{ url_for('index') }}">もう一度試す</a>
-    {% endfor %}</pre>
-      </div>
-    </div>
+<div class="container">
+  <h2>あなたの予定</h2>
+  <p class="text-muted">
+    以下の情報をGoogleカレンダーに追加できます
+    <br />
+    間違いがあれば修正してください
+  </p>
 
-    <div class="mt-3">
-      <button class="btn btn-success btn-lg" disabled>
-        📅 Googleカレンダーに追加 (準備中)
-      </button>
-      <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">
-        🔙 戻る
-      </a>
+  {% for event in events %}
+  <div class="card mb-4">
+    <div class="card-body">
+      <form action="{{ url_for('create_event') }}" method="post">
+        <h5 class="card-title text-primary mb-3">
+          📅 イベント {{ loop.index }}
+        </h5>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">イベント名</label>
+            <input
+              type="text"
+              class="form-control"
+              name="summary"
+              value="{{ event.get('イベント名', '') }}"
+              required
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">場所</label>
+            <input
+              type="text"
+              class="form-control"
+              name="location"
+              value="{{ event.get('場所', '') }}"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">日付</label>
+            <input
+              type="date"
+              class="form-control"
+              name="date"
+              value="{{ event.get('日付', '') }}"
+              required
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">開始時間</label>
+            <input
+              type="time"
+              class="form-control"
+              name="start_time"
+              value="{{ event.get('開始時間', '') }}"
+              required
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">終了時間</label>
+            <input
+              type="time"
+              class="form-control"
+              name="end_time"
+              value="{{ event.get('終了時間', '') }}"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+          <button type="submit" class="btn btn-success">
+            📅 Googleカレンダーに追加
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+  {% else %}
+  <div class="card">
+    <div class="card-body text-center">
+      <h5 class="text-muted">解析できるイベントが見つかりませんでした</h5>
+      <p class="text-muted">画像を再度アップロードしてお試しください</p>
+      <a href="{{ url_for('index') }}" class="btn btn-primary"> 🔙 戻る </a>
+    </div>
+  </div>
+  {% endfor %} {% if events %}
+  <div class="mt-4 text-center">
+    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">
+      🔙 戻る
+    </a>
+  </div>
+  {% endif %}
 </div>
+
+<!-- JavaScriptファイルの読み込み -->
+<script src="{{ url_for('static', filename='js/result.js') }}"></script>
+
 {% endblock %}

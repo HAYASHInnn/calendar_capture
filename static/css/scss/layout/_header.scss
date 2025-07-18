@@ -1,0 +1,13 @@
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .navbar-brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+    @include transition(transform, $transition-fast);
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}

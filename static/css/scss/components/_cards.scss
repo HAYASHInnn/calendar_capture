@@ -1,0 +1,37 @@
+.card {
+  border: none;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: $spacing-md;
+  @include transition();
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .card-body {
+    padding: $card-padding;
+
+    @include responsive(md) {
+      padding: $spacing-md;
+    }
+  }
+
+  .card-title {
+    margin-bottom: $spacing-md;
+    font-weight: 600;
+  }
+
+  // コード表示用
+  pre {
+    background-color: $light-gray;
+    padding: $spacing-md;
+    border-radius: $border-radius-md;
+    border: 1px solid $border-gray;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}
