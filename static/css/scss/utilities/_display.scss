@@ -1,0 +1,82 @@
+.d-none {
+  display: none;
+}
+.d-block {
+  display: block;
+}
+.d-inline {
+  display: inline;
+}
+.d-inline-block {
+  display: inline-block;
+}
+.d-flex {
+  display: flex;
+}
+.d-inline-flex {
+  display: inline-flex;
+}
+
+// フレックスボックス
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.align-items-center {
+  align-items: center;
+}
+.justify-content-center {
+  justify-content: center;
+}
+.justify-content-between {
+  justify-content: space-between;
+}
+
+// ギャップ
+.gap-sm {
+  gap: 0.5rem;
+}
+.gap-md {
+  gap: 1rem;
+}
+.gap-lg {
+  gap: 1.5rem;
+}
+
+// 幅・高さ
+.w-100 {
+  width: 100%;
+}
+.h-100 {
+  height: 100%;
+}
+
+// マージン・パディング
+.margin-bottom-md {
+  margin-bottom: 1rem;
+}
+.margin-top-md {
+  margin-top: 1rem;
+}
+.mb-3 {
+  margin-bottom: 1rem;
+}
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+.mt-3 {
+  margin-top: 1rem;
+}
+.mt-4 {
+  margin-top: 1.5rem;
+}
+.ms-2 {
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .ms-2 {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,16 @@
+.alert {
+  padding: $spacing-md;
+  border: none;
+  border-radius: $border-radius-md;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &.alert-danger {
+    background-color: lighten($danger-color, 40%);
+    color: darken($danger-color, 20%);
+  }
+
+  &.alert-success {
+    background-color: lighten($success-color, 40%);
+    color: darken($success-color, 20%);
+  }
+}

@@ -1,79 +1,83 @@
 {% extends "base.html" %} {% block content %}
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    <h1 class="text-center mb-4">画像から日程を解析</h1>
+<div class="container">
+  <h1 class="text-center mb-4">画像からカレンダー登録してみる？</h1>
 
-    {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-    {% endif %} {% if is_logged_in %}
-    <!-- ===== ログインしている時に表示する内容 ===== -->
-    <p class="text-center">Googleアカウントにログインしています</p>
-    <div class="text-center mb-3">
-      <a href="{{ url_for('logout') }}" class="btn btn-primary btn-lg">ログアウト</a>
-    </div>
-    <hr />
-    {% else %}
-    <!-- ===== ログインしていない時に表示する内容 ===== -->
-    <p class="text-center">
-      Googleアカウントでログインすると、すべての機能をご利用いただけます
-    </p>
-    <div class="text-center mb-4">
-      <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
-        <i class="fab fa-google"></i>
-        Googleでログイン
-      </a>
-    </div>
-    {% endif %}
+  <!-- ===== エラーが発生した時に表示 ===== -->
+  {% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+  {% endif %} {% if is_logged_in %}
 
-    <form method="post" enctype="multipart/form-data" id="uploadForm">
-      <div class="upload-area" id="uploadArea">
-        <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
-        <h4>日程が記載された画像をアップロード</h4>
-        <p class="text-muted">
-          ここにファイルをドラッグ&ドロップするか、クリックして選択してください
-        </p>
-        <input
-          type="file"
-          name="image"
-          id="imageInput"
-          accept="image/*"
-          class="d-none"
-          required
-        />
-        <button
-          type="button"
-          class="btn btn-outline-primary"
-          onclick="document.getElementById('imageInput').click()"
-        >
-          ファイルを選択
-        </button>
-      </div>
-
-      <div
-        id="preview"
-        class="preview-container text-center"
-        style="display: none"
-      >
-        <img id="previewImage" src="" alt="プレビュー" class="img-thumbnail" />
-      </div>
-
-      <div class="text-center">
-        <button
-          type="submit"
-          class="btn btn-primary btn-lg"
-          id="analyzeBtn"
-          disabled
-        >
-          <span
-            class="spinner-border spinner-border-sm d-none"
-            id="spinner"
-          ></span>
-          解析開始
-        </button>
-      </div>
-    </form>
+  <!-- ===== ログインしている時に表示 ===== -->
+  <p class="text-center">Googleアカウントにログインしています</p>
+  <div class="text-center mb-3">
+    <a href="{{ url_for('logout') }}" class="btn btn-primary btn-lg">
+      ログアウト
+    </a>
   </div>
+  {% else %}
+  <!-- ===== ログインしていない時に表示 ===== -->
+  <p class="text-center">
+    Googleアカウントにログインしてカレンダーに登録しよう！
+  </p>
+  <div class="text-center mb-4">
+    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+      <i class="fab fa-google"></i>
+      Googleでログイン
+    </a>
+  </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" id="uploadForm">
+    <div class="upload-area" id="uploadArea">
+      <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+      <h4>日程が記載された画像をアップロード</h4>
+      <p class="text-muted">
+        ここにファイルをドラッグ&ドロップ
+        <br />
+        または クリックして選択してください
+      </p>
+      <input
+        type="file"
+        name="image"
+        id="imageInput"
+        accept="image/*"
+        class="d-none"
+        required
+      />
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        onclick="document.getElementById('imageInput').click()"
+      >
+        ファイルを選択
+      </button>
+    </div>
+
+    <div
+      id="preview"
+      class="preview-container text-center"
+      style="display: none"
+    >
+      <img id="previewImage" src="" alt="プレビュー" class="img-thumbnail" />
+    </div>
+
+    <div class="text-center">
+      <button
+        type="submit"
+        class="btn btn-primary btn-lg"
+        id="analyzeBtn"
+        disabled
+      >
+        <span
+          class="spinner-border spinner-border-sm d-none"
+          id="spinner"
+        ></span>
+        解析開始
+      </button>
+    </div>
+  </form>
 </div>
+
 {% endblock %} {% block scripts %}
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

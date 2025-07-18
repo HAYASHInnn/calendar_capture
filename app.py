@@ -34,10 +34,10 @@ if GEMINI_API_KEY:
 
 
 def analyze_schedule_image(image_path):
-    """画像から日程情報を解析"""
     model = genai.GenerativeModel("gemini-2.0-flash")
     image = Image.open(image_path)
 
+    # 今日の日付を取得
     today = datetime.now()
     today = today.astimezone(timezone(timedelta(hours=9)))
     today_str = today.strftime("%Y年%m月%d日")
@@ -114,7 +114,7 @@ def index():
                 events = parse_gemini_result(result_text)
                 return render_template(
                     "result.html",
-                    events=events,  # ✍️ htmlに渡す変数
+                    events=events,  # htmlに渡す変数
                     image_url=f"/static/uploads/{filename}",
                 )
             except Exception as e:
@@ -128,7 +128,7 @@ def index():
 
         return render_template(
             "result.html",
-            events=events,  # ✍️ htmlに渡す変数
+            events=events,  # htmlに渡す変数
             image_url=f"/static/uploads/{filename}",
         )
 
@@ -202,16 +202,16 @@ def login():
         redirect_uri=url_for("oauth2callback", _external=True),
     )
 
-    # ✍️ 認証URLとランダムな文字列である合言葉 (state）を生成してセッションに保存
+    # 認証URLとランダムな文字列である合言葉 (state）を生成してセッションに保存
     authorization_url, state = flow.authorization_url(
-    # ✍️ リフレッシュトークンを取得し、毎回同意画面を表示させる
+    # リフレッシュトークンを取得し、毎回同意画面を表示させる
         access_type='offline',
         prompt='consent'
     )
     session["state"] = state
 
     # ユーザーをGoogleの認証ページへリダイレクト
-    # ✍️ ここで、合言葉(state)が埋め込まれた認証URLにユーザーを飛ばす（CSRF対策）
+    # ここで、合言葉(state)が埋め込まれた認証URLにユーザーを飛ばす（CSRF対策）
     return redirect(authorization_url)
 
 # セッションが保存できる辞書形式に変換する関数

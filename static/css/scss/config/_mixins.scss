@@ -1,0 +1,42 @@
+// レスポンシブ対応
+@mixin responsive($breakpoint) {
+  @if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (max-width: $breakpoint-md) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl) {
+      @content;
+    }
+  }
+}
+
+// アニメーション
+@mixin transition($property: all, $duration: $transition-base, $easing: ease) {
+  transition: $property $duration $easing;
+}
+
+// ホバー効果
+@mixin hover-lift($translate: -2px, $shadow: 0 4px 8px rgba(0, 0, 0, 0.2)) {
+  @include transition(transform, $transition-fast);
+
+  &:hover {
+    transform: translateY($translate);
+    box-shadow: $shadow;
+  }
+}
+
+// フレックスボックス
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
