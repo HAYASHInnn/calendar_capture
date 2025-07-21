@@ -183,11 +183,9 @@ def create_event():
 
         # イベント登録したら、ユーザーにメッセージとカレンダーへのリンクを見せる
         event_url = created_event.get('htmlLink')
-        return f"""
-            イベント「{summary}」をカレンダーに登録しました！<br>
-            <a href="{event_url}" target="_blank">カレンダーで確認する</a><br><br>
-            <a href="{url_for('index')}">トップページに戻る</a>
-        """
+        return render_template("created_event.html",
+                                summary=summary,
+                                event_url=event_url)
 
     except Exception as e:
         return f"エラーが発生しました: {e}"
