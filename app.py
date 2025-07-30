@@ -35,6 +35,7 @@ if GEMINI_API_KEY:
 
 def analyze_schedule_image(image_path):
     model = genai.GenerativeModel("gemini-2.0-flash")
+    # ファイルをデータオブジェクトに変換
     image = Image.open(image_path)
 
     # 今日の日付を取得
@@ -65,36 +66,47 @@ def analyze_schedule_image(image_path):
     response = model.generate_content([prompt, image], stream=False)
     return response.text
 
+
 def parse_gemini_result(result_text):
+    # 空のリストを用意する
     events = []
     # --- (ハイフン3つ) で各イベントのテキストに分割
-    event_blocks = result_text.strip().split('---')
+    event_blocks = result_text.strip().split("---")
 
     for block in event_blocks:
+        # 空のブロックはスキップ。AIの出力の都合で、空のイベントブロックができてしまっても空のイベントは無視するようにする処理
         if not block.strip():
-            continue # 空のブロックはスキップ
+            continue
 
+        # 1つのイベント情報を入れるための、空の辞書を用意
         event_data = {}
-        lines = block.strip().split('\n')
+        # 1つのイベントブロックを改行（\n）で一行ずつに分割
+        lines = block.strip().split("\n")
         for line in lines:
-            if ':' in line:
-                key, value = line.split(':', 1)
+            if ":" in line:
+                # ":"を区切りとして、keyとvalueに分割する
+                # split(':', 1) の "1" は、「最初の:でだけ分割してね」という意味
+                # "イベント名:重要:会議" のような値でも正しく分割できる
+                key, value = line.split(":", 1)
+                # stripを使うのは、AIの出力の都合での空白によるバグ防止
                 event_data[key.strip()] = value.strip()
 
         # 時間を分割して開始と終了に分ける
-        if '時間' in event_data and '-' in event_data['時間']:
-            start_time, end_time = event_data['時間'].split('-', 1)
-            event_data['開始時間'] = start_time.strip()
-            event_data['終了時間'] = end_time.strip()
+        if "時間" in event_data and "-" in event_data["時間"]:
+            start_time, end_time = event_data["時間"].split("-", 1)
+            event_data["開始時間"] = start_time.strip()
+            event_data["終了時間"] = end_time.strip()
 
+        # 完成した1つのイベント情報を、最初のリストに追加する
         events.append(event_data)
 
     return events
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     # セッションに 'credentials' があればログイン済み
-    is_logged_in = 'credentials' in session
+    is_logged_in = "credentials" in session
 
     if not is_logged_in:
         # ログインしていなければ、ログインを促すページを表示
@@ -115,7 +127,6 @@ def index():
                 return render_template(
                     "result.html",
                     events=events,  # htmlに渡す変数
-                    image_url=f"/static/uploads/{filename}",
                 )
             except Exception as e:
                 return render_template(
@@ -129,28 +140,27 @@ def index():
         return render_template(
             "result.html",
             events=events,  # htmlに渡す変数
-            image_url=f"/static/uploads/{filename}",
         )
-
 
     # GETリクエストの場合 (ログイン済みで、ただトップページを表示するとき)
     return render_template("index.html", is_logged_in=True)
 
-@app.route('/create_event', methods=['POST'])
+
+@app.route("/create_event", methods=["POST"])
 def create_event():
     # Googleカレンダーに登録するので、ログインしているか確認
-    if 'credentials' not in session:
-        return redirect(url_for('login'))
+    if "credentials" not in session:
+        return redirect(url_for("login"))
 
     # htmlから送信されたデータを取得
-    summary = request.form.get('summary')
-    date_str = request.form.get('date')
-    start_time_str = request.form.get('start_time')
-    end_time_str = request.form.get('end_time')
-    location = request.form.get('location')
+    summary = request.form.get("summary")
+    date_str = request.form.get("date")
+    start_time_str = request.form.get("start_time")
+    end_time_str = request.form.get("end_time")
+    location = request.form.get("location")
 
     # セッションからGoogleカレンダーに連携するため、ログイン時の認証情報を読み込む
-    creds_dict = session['credentials']
+    creds_dict = session["credentials"]
     credentials = Credentials(**creds_dict)
 
     # Googleカレンダーに連携
@@ -162,34 +172,32 @@ def create_event():
 
     # APIに渡すイベントデータ（辞書）を作成
     event_body = {
-        'summary': summary,
-        'location': location,
-        'start': {
-            'dateTime': start_datetime_for_api,
-            'timeZone': 'Asia/Tokyo',
+        "summary": summary,
+        "location": location,
+        "start": {
+            "dateTime": start_datetime_for_api,
+            "timeZone": "Asia/Tokyo",
         },
-        'end': {
-            'dateTime': end_datetime_for_api,
-            'timeZone': 'Asia/Tokyo',
+        "end": {
+            "dateTime": end_datetime_for_api,
+            "timeZone": "Asia/Tokyo",
         },
     }
 
     try:
         # 'primary'はメインカレンダーのこと
-        created_event = service.events().insert(
-            calendarId='primary',
-            body=event_body
-        ).execute()
+        created_event = (
+            service.events().insert(calendarId="primary", body=event_body).execute()
+        )
 
         # イベント登録したら、ユーザーにメッセージとカレンダーへのリンクを見せる
-        event_url = created_event.get('htmlLink')
-        return render_template("created_event.html",
-                                summary=summary,
-                                event_url=event_url)
+        event_url = created_event.get("htmlLink")
+        return render_template(
+            "created_event.html", summary=summary, event_url=event_url
+        )
 
     except Exception as e:
         return f"エラーが発生しました: {e}"
-
 
 
 @app.route("/login", methods=["GET"])
@@ -202,15 +210,16 @@ def login():
 
     # 認証URLとランダムな文字列である合言葉 (state）を生成してセッションに保存
     authorization_url, state = flow.authorization_url(
-    # リフレッシュトークンを取得し、毎回同意画面を表示させる
-        access_type='offline',
-        prompt='consent'
+        # リフレッシュトークンを取得し、毎回同意画面を表示させる
+        access_type="offline",
+        prompt="consent",
     )
     session["state"] = state
 
     # ユーザーをGoogleの認証ページへリダイレクト
     # ここで、合言葉(state)が埋め込まれた認証URLにユーザーを飛ばす（CSRF対策）
     return redirect(authorization_url)
+
 
 # セッションが保存できる辞書形式に変換する関数
 def credentials_to_dict(credentials):
@@ -222,6 +231,7 @@ def credentials_to_dict(credentials):
         "client_secret": credentials.client_secret,
         "scopes": credentials.scopes,
     }
+
 
 @app.route("/oauth2callback", methods=["GET"])
 def oauth2callback():
@@ -241,16 +251,17 @@ def oauth2callback():
 
     return redirect(url_for("index"))
 
-@app.route('/logout')
+
+@app.route("/logout")
 def logout():
     # セッションからcredentialsを削除
-    session.pop('credentials', None)
+    session.pop("credentials", None)
     # トップページにリダイレクト
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
     # 開発環境でHTTPでのOAuth認証を許可するための設定
     # ❗ 本番環境ではこの行は削除し、必ずHTTPSを使用する！！！
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
     app.run(debug=True, host="0.0.0.0", port=3000)
