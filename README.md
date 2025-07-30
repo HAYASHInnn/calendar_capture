@@ -1,6 +1,5 @@
-デモ動画
-
-_(このデモ動画は、アプリの主要な機能（ログイン → 画像アップロード → AI による解析 → カレンダー登録）を示しています。)_
+![デモ動画](https://github.com/HAYASHInnn/calendar_capture/blob/main/docs/images/demo.gif)
+_このデモ動画は、アプリの主要な機能（ログイン → 画像アップロード → AI による解析 → カレンダー登録）を示しています。_
 
 # 📅 Calendar Capture
 
@@ -73,6 +72,7 @@ _(このデモ動画は、アプリの主要な機能（ログイン → 画像�
   </a>
 
 ## システム構図
+![システム構図](https://github.com/HAYASHInnn/calendar_capture/blob/main/docs/images/system-diagram.png)
 
 ## ローカル環境での実行方法
 
